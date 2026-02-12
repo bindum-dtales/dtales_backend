@@ -49,18 +49,20 @@ function normalizeCaseStudy(row) {
 }
 
 router.get("/", async (_req, res) => {
-  try {
-    const { data, error } = await supabase
-      .from("case_studies")
-      .select("*")
-      .order("created_at", { ascending: false });
+  const { data, error } = await supabase
+    .from("case_studies")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-    if (error) throw error;
-
-    res.json((data || []).map(normalizeCaseStudy));
-  } catch (err) {
-    return res.status(500).json({ error: "Failed to fetch case studies" });
+  if (error) {
+    console.error("Supabase error:", error);
+    return res.status(500).json({
+      error: error.message,
+      details: error
+    });
   }
+
+  res.json((data || []).map(normalizeCaseStudy));
 });
 
 router.get("/public", async (_req, res) => {

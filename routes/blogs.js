@@ -49,18 +49,20 @@ function normalizeBlog(row) {
 }
 
 router.get("/", async (_req, res) => {
-  try {
-    const { data, error } = await supabase
-      .from("blogs")
-      .select("*")
-      .order("created_at", { ascending: false });
+  const { data, error } = await supabase
+    .from("blogs")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-    if (error) throw error;
-
-    res.json((data || []).map(normalizeBlog));
-  } catch (err) {
-    return res.status(500).json({ error: "Failed to fetch blogs" });
+  if (error) {
+    console.error("Supabase error:", error);
+    return res.status(500).json({
+      error: error.message,
+      details: error
+    });
   }
+
+  res.json((data || []).map(normalizeBlog));
 });
 
 router.get("/public", async (_req, res) => {
