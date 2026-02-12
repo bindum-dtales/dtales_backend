@@ -5,6 +5,7 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 console.log("SUPABASE_URL:", supabaseUrl ? "Loaded" : "Missing");
 console.log("SUPABASE_SERVICE_ROLE_KEY:", supabaseKey ? "Loaded" : "Missing");
+console.log("NODE_ENV:", process.env.NODE_ENV || "(not set)");
 
 let supabase = null;
 
