@@ -49,6 +49,13 @@ function normalizeCaseStudy(row) {
 }
 
 router.get("/", async (_req, res) => {
+  if (!supabase) {
+    return res.status(500).json({
+      error: "Supabase not initialized",
+      details: "Environment variables may be missing"
+    });
+  }
+
   const { data, error } = await supabase
     .from("case_studies")
     .select("*")
