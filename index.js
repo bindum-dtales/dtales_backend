@@ -5,9 +5,7 @@ import express from "express";
 import cors from "cors";
 
 import blogsRouter from "./routes/blogs.js";
-import blogsRoutes from "./routes/blogs.js";
 import caseStudiesRouter from "./routes/case-studies.js";
-import caseStudiesRoutes from "./routes/case-studies.js";
 import uploadsRouter from "./routes/uploads.js";
 
 const app = express();
@@ -35,11 +33,8 @@ app.get("/health", (_req, res) => {
   res.json({ ok: true });
 });
 
-app.use("/api/blogs", blogsRouter);
-app.use("/api/case-studies", caseStudiesRouter); // ✅ THIS FIXES IT
-
-app.use("/blogs", blogsRoutes);
-app.use("/case-studies", caseStudiesRoutes);
+app.use("/blogs", blogsRouter);
+app.use("/case-studies", caseStudiesRouter);
 
 app.get("/", (req, res) => {
   res.send("DTales Backend Running 🚀");
