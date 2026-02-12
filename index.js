@@ -3,13 +3,20 @@ import express from "express";
 import cors from "cors";
 
 import blogsRouter from "./routes/blogs.js";
+import blogsRoutes from "./routes/blogs.js";
 import caseStudiesRouter from "./routes/case-studies.js";
+import caseStudiesRoutes from "./routes/case-studies.js";
 import uploadsRouter from "./routes/uploads.js";
 
 const app = express();
 
 // CRITICAL: CORS must come first (headers only)
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true
+  })
+);
 
 // CRITICAL: Mount upload routes BEFORE any body parsing middleware
 // Multer handles multipart/form-data parsing internally
@@ -28,6 +35,9 @@ app.get("/health", (_req, res) => {
 
 app.use("/api/blogs", blogsRouter);
 app.use("/api/case-studies", caseStudiesRouter); // ✅ THIS FIXES IT
+
+app.use("/blogs", blogsRoutes);
+app.use("/case-studies", caseStudiesRoutes);
 
 app.get("/", (req, res) => {
   res.send("DTales Backend Running 🚀");
