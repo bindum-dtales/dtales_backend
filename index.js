@@ -10,7 +10,7 @@ import uploadsRouter from "./routes/uploads.js";
 
 const app = express();
 
-// CRITICAL: CORS must come first (headers only)
+// CORS middleware - enable for all routes
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -18,29 +18,26 @@ app.use(
   })
 );
 
-// CRITICAL: Mount upload routes BEFORE any body parsing middleware
-// Multer handles multipart/form-data parsing internally
-// If express.json() or express.urlencoded() run first, they will
-// consume/corrupt the request body, causing ERR_HTTP2_PROTOCOL_ERROR
-app.use("/api/uploads", uploadsRouter);
-
-// Body parsers - only applied to non-upload routes due to order above
+// Body parsing middleware
 // CRITICAL: 10mb limit to handle large HTML content with embedded images
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-app.get("/health", (_req, res) => {
-  res.json({ ok: true });
+// Root health check
+app.get("/", (_req, res) => {
+  res.send("DTALES API Running");
 });
 
-app.use("/blogs", blogsRouter);
-app.use("/case-studies", caseStudiesRouter);
+// CRITICAL: Mount upload routes BEFORE express.json() would interfere
+// Multer handles multipart/form-data parsing internally
+// Uploads route mounted at /api/uploads
+app.use("/api/uploads", uploadsRouter);
 
-app.get("/", (req, res) => {
-  res.send("DTales Backend Running 🚀");
-});
+// API Routes
+app.use("/api/blogs", blogsRouter);
+app.use("/api/case-studies", caseStudiesRouter);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
