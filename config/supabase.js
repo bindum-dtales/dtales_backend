@@ -15,4 +15,11 @@ if (supabaseUrl && supabaseKey) {
   console.error("Supabase environment variables missing at runtime");
 }
 
+export function getSupabaseStatus() {
+  return {
+    supabaseUrlLoaded: !!process.env.SUPABASE_URL,
+    supabaseKeyLoaded: !!process.env.SUPABASE_SERVICE_ROLE_KEY
+  };
+}
+
 export { supabase };

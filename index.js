@@ -7,6 +7,7 @@ import cors from "cors";
 import blogsRouter from "./routes/blogs.js";
 import caseStudiesRouter from "./routes/case-studies.js";
 import uploadsRouter from "./routes/uploads.js";
+import { getSupabaseStatus } from "./config/supabase.js";
 
 const app = express();
 
@@ -37,9 +38,15 @@ console.log("✅ Root route mounted: GET /");
 
 // API test route for diagnostics
 app.get("/api/test", (_req, res) => {
+  const supabaseStatus = getSupabaseStatus();
   res.json({ 
     status: "API working",
     timestamp: new Date().toISOString(),
+    supabase: {
+      supabaseUrlLoaded: supabaseStatus.supabaseUrlLoaded,
+      supabaseKeyLoaded: supabaseStatus.supabaseKeyLoaded,
+      configured: supabaseStatus.supabaseUrlLoaded && supabaseStatus.supabaseKeyLoaded
+    },
     endpoints: [
       "GET /api/blogs/public",
       "GET /api/case-studies/public",
