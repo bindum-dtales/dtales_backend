@@ -6,6 +6,8 @@ const router = Router();
 // GET / - Return all portfolio items ordered by created_at DESC
 router.get("/", async (req, res) => {
   try {
+    console.log("SUPABASE_URL:", process.env.SUPABASE_URL);
+    console.log("SUPABASE_SERVICE_ROLE_KEY:", process.env.SUPABASE_SERVICE_ROLE_KEY);
     const supabase = getSupabaseClient();
     if (!supabase) {
       return res.status(500).json({
