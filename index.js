@@ -82,6 +82,17 @@ app.use((req, res) => {
   });
 });
 
+// Debug route to check environment variables
+app.get("/api/env-check", (req, res) => {
+  res.json({
+    SUPABASE_URL: process.env.SUPABASE_URL || "undefined",
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY
+      ? "LOADED"
+      : "undefined",
+    NODE_ENV: process.env.NODE_ENV || "undefined"
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, "0.0.0.0", () => {
