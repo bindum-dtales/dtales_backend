@@ -1,6 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import express from "express";
 import cors from "cors";
 import portfolioRoute from "./routes/portfolio.js";
@@ -23,6 +20,15 @@ app.get("/api/env-check", (req, res) => {
     hasUrl: !!process.env.SUPABASE_URL,
     hasKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
     bucket: process.env.SUPABASE_BUCKET || null
+  });
+});
+
+app.get("/api/full-env", (req, res) => {
+  res.json({
+    SUPABASE_URL: process.env.SUPABASE_URL || null,
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ? "LOADED" : null,
+    SUPABASE_BUCKET: process.env.SUPABASE_BUCKET || null,
+    NODE_ENV: process.env.NODE_ENV || null
   });
 });
 
