@@ -24,6 +24,16 @@ app.use("/api/blogs", blogsRoute);
 app.use("/api/case-studies", caseStudiesRoute);
 app.use("/api/uploads", uploadsRoute);
 
+// Debug environment variables
+app.get("/api/debug-env", (req, res) => {
+  res.json({
+    url: process.env.SUPABASE_URL || null,
+    key: process.env.SUPABASE_SERVICE_ROLE_KEY ? "exists" : null,
+    bucket: process.env.SUPABASE_BUCKET || null,
+    nodeEnv: process.env.NODE_ENV || null
+  });
+});
+
 // 404 fallback
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
