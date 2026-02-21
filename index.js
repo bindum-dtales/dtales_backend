@@ -1,3 +1,11 @@
+import "dotenv/config";
+
+console.log("ENV CHECK:");
+console.log("SUPABASE_URL:", process.env.SUPABASE_URL);
+console.log("SUPABASE_SERVICE_ROLE_KEY:", process.env.SUPABASE_SERVICE_ROLE_KEY ? "SET" : "MISSING");
+console.log("SUPABASE_BUCKET:", process.env.SUPABASE_BUCKET);
+console.log("NODE_ENV:", process.env.NODE_ENV);
+
 console.log("INDEX FILE LOADED");
 
 import express from "express";
