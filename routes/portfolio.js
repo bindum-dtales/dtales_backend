@@ -13,20 +13,29 @@ router.get("/", async (_req, res) => {
       });
     }
 
-    const { data, error } = await supabase
+    const response = await supabase
       .from("portfolio")
       .select("*");
 
-    if (error) {
-      throw error;
+    if (!response) {
+      return res.json([]);
     }
 
-    return res.json(data || []);
+    if (response.error) {
+      console.error("Portfolio query error:", response.error);
+      return res.status(500).json({
+        error: "Database error",
+        details: response.error.message
+      });
+    }
 
-  } catch (error) {
-    console.error("GET /portfolio error:", error);
+    return res.json(response.data || []);
+
+  } catch (err) {
+    console.error("Portfolio route crash:", err);
     return res.status(500).json({
-      error: error.message
+      error: "Portfolio route failed",
+      details: err.message
     });
   }
 });
