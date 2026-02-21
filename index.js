@@ -59,6 +59,33 @@ app.get("/api/debug-env", (req, res) => {
   });
 });
 
+// Network connectivity test
+app.get("/network-test", async (req, res) => {
+  try {
+    const response = await fetch("https://google.com");
+    res.json({ status: "success", httpStatus: response.status });
+  } catch (err) {
+    res.json({ error: err.message, cause: err.cause?.code });
+  }
+});
+
+// Supabase connectivity test
+app.get("/supabase-test", async (req, res) => {
+  try {
+    const response = await fetch(
+      process.env.SUPABASE_URL + "/rest/v1/",
+      {
+        headers: {
+          apikey: process.env.SUPABASE_SERVICE_ROLE_KEY
+        }
+      }
+    );
+    res.json({ status: response.status, ok: response.ok });
+  } catch (err) {
+    res.json({ error: err.message, cause: err.cause?.code });
+  }
+});
+
 // 404 fallback
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
