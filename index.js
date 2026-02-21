@@ -1,8 +1,11 @@
-console.log("=== STARTUP ENV CHECK ===");
+import dotenv from "dotenv";
+dotenv.config();
+
+console.log("=== FORCED ENV LOAD ===");
 console.log("SUPABASE_URL:", process.env.SUPABASE_URL);
 console.log("SUPABASE_SERVICE_ROLE_KEY exists:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
 console.log("SUPABASE_BUCKET:", process.env.SUPABASE_BUCKET);
-console.log("==========================");
+console.log("========================");
 
 import express from "express";
 import cors from "cors";
