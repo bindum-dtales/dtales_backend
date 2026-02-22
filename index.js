@@ -17,6 +17,14 @@ app.get("/", (req, res) => {
   res.send("SERVER RUNNING - STEP 6");
 });
 
+app.get("/debug-env", (req, res) => {
+  res.json({
+    hasUrl: !!process.env.SUPABASE_URL,
+    hasKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+    nodeVersion: process.version
+  });
+});
+
 app.use("/api/portfolio", portfolioRoute);
 app.use("/api/blogs", blogsRoute);
 app.use("/api/case-studies", caseStudiesRoute);
