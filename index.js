@@ -17,30 +17,6 @@ app.get("/", (req, res) => {
   res.send("SERVER RUNNING - STEP 6");
 });
 
-app.get("/env-check", (req, res) => {
-  res.json({
-    hasUrl: !!process.env.SUPABASE_URL,
-    hasKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-  });
-});
-
-app.get("/test-fetch", async (req, res) => {
-  try {
-    const response = await fetch("https://upkfbqljrnlufflknkv.supabase.co");
-
-    res.json({
-      ok: response.ok,
-      status: response.status,
-      statusText: response.statusText
-    });
-  } catch (err) {
-    res.json({
-      error: err.message,
-      stack: err.stack
-    });
-  }
-});
-
 app.use("/api/portfolio", portfolioRoute);
 app.use("/api/blogs", blogsRoute);
 app.use("/api/case-studies", caseStudiesRoute);
