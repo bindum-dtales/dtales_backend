@@ -11,6 +11,11 @@ console.log("INDEX FILE LOADED");
 import express from "express";
 import cors from "cors";
 
+import portfolioRoute from "./routes/portfolio.js";
+import blogsRoute from "./routes/blogs.js";
+import caseStudiesRoute from "./routes/case-studies.js";
+import uploadsRoute from "./routes/uploads.js";
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,27 +34,11 @@ app.get("/api/test", (req, res) => {
   res.json({ status: "API running" });
 });
 
-// SAFE ROUTE LOADING
-async function loadRoutes() {
-  try {
-    const portfolioRoute = (await import("./routes/portfolio.js")).default;
-    const blogsRoute = (await import("./routes/blogs.js")).default;
-    const caseStudiesRoute = (await import("./routes/case-studies.js")).default;
-    const uploadsRoute = (await import("./routes/uploads.js")).default;
-
-    app.use("/api/portfolio", portfolioRoute);
-    app.use("/api/blogs", blogsRoute);
-    app.use("/api/case-studies", caseStudiesRoute);
-    app.use("/api/uploads", uploadsRoute);
-
-    console.log("✓ All routes mounted successfully");
-
-  } catch (err) {
-    console.error("Route loading failed:", err);
-  }
-}
-
-loadRoutes();
+// Mount routes
+app.use("/api/portfolio", portfolioRoute);
+app.use("/api/blogs", blogsRoute);
+app.use("/api/case-studies", caseStudiesRoute);
+app.use("/api/uploads", uploadsRoute);
 
 // Debug environment variables
 app.get("/api/debug-env", (req, res) => {
