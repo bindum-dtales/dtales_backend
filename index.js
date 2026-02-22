@@ -27,9 +27,17 @@ app.get("/env-check", (req, res) => {
 app.get("/test-fetch", async (req, res) => {
   try {
     const response = await fetch("https://google.com");
-    res.json({ ok: response.ok });
+
+    res.json({
+      ok: response.ok,
+      status: response.status,
+      statusText: response.statusText
+    });
   } catch (err) {
-    res.json({ error: err.message });
+    res.json({
+      error: err.message,
+      stack: err.stack
+    });
   }
 });
 
