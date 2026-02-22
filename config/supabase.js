@@ -1,14 +1,19 @@
 import { createClient } from "@supabase/supabase-js";
 
-const url = process.env.SUPABASE_URL;
-const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+let cachedClient = null;
 
-let supabase = null;
+export function getSupabaseClient() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (url && key) {
-  supabase = createClient(url, key);
-} else {
-  console.warn("⚠ Supabase not configured properly.");
+  if (!url || !key) {
+    console.warn("Supabase environment variables missing.");
+    return null;
+  }
+
+  if (!cachedClient) {
+    cachedClient = createClient(url, key);
+  }
+
+  return cachedClient;
 }
-
-export default supabase;
