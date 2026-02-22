@@ -3,7 +3,7 @@ import { getSupabaseClient } from "../config/supabase.js";
 
 const router = express.Router();
 
-router.get("/", async (_req, res) => {
+router.get("/", async (req, res) => {
   try {
     const supabase = getSupabaseClient();
 
@@ -13,23 +13,19 @@ router.get("/", async (_req, res) => {
       });
     }
 
-    const response = await supabase
+    const { data, error } = await supabase
       .from("portfolio")
       .select("*");
 
-    if (!response) {
-      return res.json([]);
-    }
-
-    if (response.error) {
-      console.error("Portfolio query error:", response.error);
+    if (error) {
+      console.error("Portfolio query error:", error);
       return res.status(500).json({
         error: "Database error",
-        details: response.error.message
+        details: error.message
       });
     }
 
-    return res.json(response.data || []);
+    return res.json(data || []);
 
   } catch (err) {
     console.error("Portfolio route crash:", err);
