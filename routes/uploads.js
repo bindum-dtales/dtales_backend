@@ -4,21 +4,6 @@ import { getSupabaseClient } from "../config/supabase.js";
 
 const router = express.Router();
 
-async function resolveBucketName(supabase) {
-  const { data, error } = await supabase.storage.listBuckets();
-  if (error) {
-    console.error("Upload route error:", error);
-    return null;
-  }
-
-  const bucket = data?.[0]?.name || null;
-  if (!bucket) {
-    console.error("Upload route error: No storage buckets available");
-  }
-
-  return bucket;
-}
-
 // Create separate multer instances to prevent HTTP2 protocol errors
 // Image uploads: strict filtering, 4MB limit
 const imageUpload = multer({
@@ -62,10 +47,10 @@ router.post("/image", imageUpload.single("image"), async (req, res) => {
       });
     }
 
-    const bucket = await resolveBucketName(supabase);
+    const bucket = process.env.SUPABASE_BUCKET;
     if (!bucket) {
       return res.status(500).json({
-        error: "Supabase not configured"
+        error: "Supabase bucket not configured"
       });
     }
 
@@ -141,10 +126,10 @@ router.post("/docx", docxUpload.single("file"), async (req, res) => {
       });
     }
 
-    const bucket = await resolveBucketName(supabase);
+    const bucket = process.env.SUPABASE_BUCKET;
     if (!bucket) {
       return res.status(500).json({
-        error: "Supabase not configured"
+        error: "Supabase bucket not configured"
       });
     }
 

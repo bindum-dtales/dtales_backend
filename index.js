@@ -1,52 +1,47 @@
-// Production fallback for environment variables (Hostinger doesn't load .env)
-if (!process.env.SUPABASE_URL) {
-  process.env.SUPABASE_URL = "https://upkfbqljrnlufflknkv.supabase.co";
-}
-
-if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-  process.env.SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwa2ZidHFsanJubHVmZmxrbmt2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODk4ODIwOCwiZXhwIjoyMDg0NTY0MjA4fQ.wIQe5KZAZFdKst5s1v9TbH844D0xqHpoOFstVTUnOUM";
-}
-
-if (!process.env.SUPABASE_BUCKET) {
-  process.env.SUPABASE_BUCKET = "dtales-media";
-}
-
-if (!process.env.FRONTEND_URL) {
-  process.env.FRONTEND_URL = "https://dtales.tech";
-}
-
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import cors from "cors";
-import dns from "dns/promises";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 import portfolioRoute from "./routes/portfolio.js";
 import blogsRoute from "./routes/blogs.js";
 import caseStudiesRoute from "./routes/case-studies.js";
 import uploadsRoute from "./routes/uploads.js";
 
-console.log("ENV CHECK START:");
-console.log("SUPABASE_URL:", process.env.SUPABASE_URL);
-console.log("SUPABASE_SERVICE_ROLE_KEY:", process.env.SUPABASE_SERVICE_ROLE_KEY ? "EXISTS" : "MISSING");
-console.log("NODE_ENV:", process.env.NODE_ENV);
-
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
+const isProduction = process.env.NODE_ENV === "production";
 
-app.use(cors({ origin: true }));
+if (isProduction && !process.env.FRONTEND_URL) {
+  console.error("FRONTEND_URL is required in production");
+  process.exit(1);
+}
+
+app.use(cors({
+  origin: isProduction ? process.env.FRONTEND_URL : true,
+  credentials: true
+}));
 app.use(express.json({ limit: "10mb" }));
+app.use(helmet());
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100
+});
+
+app.use("/api", limiter);
+
+console.log("Environment:", process.env.NODE_ENV);
+console.log("Frontend URL:", process.env.FRONTEND_URL);
 
 app.get("/", (req, res) => {
   res.send("SERVER RUNNING - STEP 6");
 });
 
-app.get("/debug-env", (req, res) => {
-  res.json({
-    hasUrl: !!process.env.SUPABASE_URL,
-    hasKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-    nodeVersion: process.version
-  });
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
 });
 
 app.use("/api/portfolio", portfolioRoute);
@@ -58,74 +53,6 @@ app.get("/ping", (req, res) => {
   res.json({ ok: true });
 });
 
-app.get("/test-fetch", async (req, res) => {
-  try {
-    const r = await fetch("https://google.com");
-    res.json({ status: r.status });
-  } catch (err) {
-    res.json({ error: err.message });
-  }
-});
-
-app.get("/test-supabase", async (req, res) => {
-  try {
-    const r = await fetch(process.env.SUPABASE_URL, {
-      headers: {
-        apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
-      },
-    });
-
-    res.json({
-      status: r.status,
-      ok: r.ok
-    });
-  } catch (err) {
-    res.json({
-      error: err.message
-    });
-  }
-});
-
-app.get("/deep-test", async (req, res) => {
-  try {
-    const results = {};
-
-    // 1️⃣ DNS lookup test
-    try {
-      const lookup = await dns.lookup("google.com");
-      results.googleDNS = lookup;
-    } catch (e) {
-      results.googleDNS = e.message;
-    }
-
-    try {
-      const lookup = await dns.lookup("supabase.co");
-      results.supabaseDNS = lookup;
-    } catch (e) {
-      results.supabaseDNS = e.message;
-    }
-
-    // 2️⃣ Direct fetch test
-    try {
-      const r = await fetch("https://google.com");
-      results.googleFetch = r.status;
-    } catch (e) {
-      results.googleFetch = e.message;
-    }
-
-    try {
-      const r = await fetch(process.env.SUPABASE_URL + "/rest/v1/");
-      results.supabaseFetch = r.status;
-    } catch (e) {
-      results.supabaseFetch = e.message;
-    }
-
-    res.json(results);
-  } catch (err) {
-    res.json({ error: err.message });
-  }
-});
-
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("SERVER STARTED ON PORT", PORT);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
