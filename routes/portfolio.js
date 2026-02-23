@@ -44,12 +44,12 @@ router.post("/", async (req, res) => {
       return res.status(500).json({ error: "Supabase not configured" });
     }
 
-    const { title, project_link, category, cover_image_url } = req.body;
+    const { title, link, category, cover_image_url } = req.body;
 
     const { data, error } = await supabase
       .from("portfolio")
       .insert([
-        { title, link: project_link, category, cover_image_url }
+        { title, link, category, cover_image_url }
       ])
       .select()
       .single();
