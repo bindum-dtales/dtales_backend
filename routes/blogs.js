@@ -68,6 +68,20 @@ router.get("/", async (_req, res) => {
       });
     }
 
+    const testResponse = await fetch(
+      `${process.env.SUPABASE_URL}/rest/v1/blogs?select=*`,
+      {
+        headers: {
+          apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
+        }
+      }
+    );
+
+    console.log("Direct REST status:", testResponse.status);
+    const testText = await testResponse.text();
+    console.log("Direct REST response:", testText);
+
     try {
       const { data, error } = await supabase
         .from("blogs")
