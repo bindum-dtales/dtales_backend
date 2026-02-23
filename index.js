@@ -53,6 +53,15 @@ app.use("/api/blogs", blogsRoute);
 app.use("/api/case-studies", caseStudiesRoute);
 app.use("/api/uploads", uploadsRoute);
 
+app.get("/test-fetch", async (req, res) => {
+  try {
+    const r = await fetch("https://google.com");
+    res.json({ status: r.status });
+  } catch (err) {
+    res.json({ error: err.message });
+  }
+});
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log("SERVER STARTED ON PORT", PORT);
 });
