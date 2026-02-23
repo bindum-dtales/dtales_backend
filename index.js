@@ -59,10 +59,42 @@ app.get("/ping", (req, res) => {
 
 app.get("/debug-supabase", async (req, res) => {
   try {
-    const r = await fetch(process.env.SUPABASE_URL);
-    res.json({ status: r.status });
+    const url = process.env.SUPABASE_URL;
+
+    if (!url) {
+      return res.json({
+        step: "env missing",
+        error: "SUPABASE_URL is not defined"
+      });
+    }
+
+    const dns = await import("dns/promises");
+
+    let resolved;
+    try {
+      resolved = await dns.lookup(new URL(url).hostname);
+    } catch (dnsErr) {
+      return res.json({
+        step: "dns lookup failed",
+        error: dnsErr.message,
+        url
+      });
+    }
+
+    const response = await fetch(url);
+
+    return res.json({
+      step: "success",
+      status: response.status,
+      resolved
+    });
+
   } catch (err) {
-    res.json({ error: err.message });
+    return res.json({
+      step: "fetch failed",
+      error: err.message,
+      url: process.env.SUPABASE_URL
+    });
   }
 });
 
