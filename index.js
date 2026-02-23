@@ -1,3 +1,20 @@
+// Production fallback for environment variables (Hostinger doesn't load .env)
+if (!process.env.SUPABASE_URL) {
+  process.env.SUPABASE_URL = "https://upkfbqljrnlufflknkv.supabase.co";
+}
+
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  process.env.SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwa2ZidHFsanJubHVmZmxrbmt2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODk4ODIwOCwiZXhwIjoyMDg0NTY0MjA4fQ.wIQe5KZAZFdKst5s1v9TbH844D0xqHpoOFstVTUnOUM";
+}
+
+if (!process.env.SUPABASE_BUCKET) {
+  process.env.SUPABASE_BUCKET = "dtales-media";
+}
+
+if (!process.env.FRONTEND_URL) {
+  process.env.FRONTEND_URL = "https://dtales.tech";
+}
+
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
