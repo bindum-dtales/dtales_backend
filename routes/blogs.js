@@ -51,6 +51,10 @@ function normalizeBlog(row) {
 
 router.get("/", async (_req, res) => {
   try {
+    console.log("=== BLOGS DEBUG START ===");
+    console.log("SUPABASE_URL:", process.env.SUPABASE_URL);
+    console.log("SUPABASE_SERVICE_ROLE_KEY exists:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+
     const supabase = getSupabaseClient();
     if (!supabase) {
       return res.status(500).json({
@@ -58,16 +62,28 @@ router.get("/", async (_req, res) => {
       });
     }
 
-    const { data, error } = await supabase
-      .from("blogs")
-      .select("*")
-      .order("created_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("blogs")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-    if (error) {
-      throw error;
+      if (error) {
+        console.error("Supabase error:", error);
+        return res.status(500).json({ error: error.message });
+      }
+
+      console.log("Supabase success, rows:", data?.length);
+      return res.json((data || []).map(normalizeBlog));
+
+    } catch (err) {
+      console.error("Fetch crash error:", err);
+      return res.status(500).json({
+        error: "Supabase fetch crashed",
+        details: err.message,
+        stack: err.stack
+      });
     }
-
-    res.json((data || []).map(normalizeBlog));
   } catch (error) {
     console.error("GET / error:", error);
     return res.status(500).json({ error: error.message });
