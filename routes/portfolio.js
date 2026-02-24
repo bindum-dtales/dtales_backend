@@ -71,4 +71,56 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.delete("/:id", async (req, res) => {
+  try {
+    const supabase = getSupabaseClient();
+
+    if (!supabase) {
+      return res.status(500).json({ error: "Supabase not configured" });
+    }
+
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        error: "Missing ID parameter"
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("portfolio")
+      .delete()
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Portfolio delete error:", error);
+      return res.status(500).json({
+        error: "Delete failed",
+        details: error.message
+      });
+    }
+
+    if (!data) {
+      return res.status(404).json({
+        error: "Portfolio item not found"
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Portfolio item deleted successfully",
+      deleted: data
+    });
+
+  } catch (err) {
+    console.error("Portfolio delete route crash:", err);
+    return res.status(500).json({
+      error: "Portfolio delete failed",
+      details: err.message
+    });
+  }
+});
+
 export default router;
