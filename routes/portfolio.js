@@ -123,4 +123,79 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  try {
+    const supabase = getSupabaseClient();
+
+    if (!supabase) {
+      return res.status(500).json({ error: "Supabase not configured" });
+    }
+
+    const { id } = req.params;
+    const { title, link, category, cover_image_url, published } = req.body;
+
+    // Validation
+    if (!id) {
+      return res.status(400).json({
+        error: "Missing ID parameter"
+      });
+    }
+
+    if (!title || !link || !category) {
+      return res.status(400).json({
+        error: "Missing required fields",
+        details: "title, link, and category are required"
+      });
+    }
+
+    // Check if portfolio item exists
+    const { data: existingData, error: checkError } = await supabase
+      .from("portfolio")
+      .select("id")
+      .eq("id", id)
+      .single();
+
+    if (checkError || !existingData) {
+      return res.status(400).json({
+        error: "Portfolio item not found"
+      });
+    }
+
+    // Update the portfolio item
+    const { data, error } = await supabase
+      .from("portfolio")
+      .update({
+        title,
+        link,
+        category,
+        cover_image_url,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Portfolio update error:", error);
+      return res.status(500).json({
+        error: "Update failed",
+        details: error.message
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Portfolio item updated successfully",
+      data: data
+    });
+
+  } catch (err) {
+    console.error("Portfolio update route crash:", err);
+    return res.status(500).json({
+      error: "Portfolio update failed",
+      details: err.message
+    });
+  }
+});
+
 export default router;
